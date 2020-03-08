@@ -16,7 +16,7 @@ one_qubit_conversion(complexd *A, complexd *B, double H[4], int n, int k){
 	shift_n = 1 << n;
 	shift_nk = 1 << (n - k);
 	inv_nk = ~shift_nk;
-#pragma omp parallel for firstprivate(change_bit) schedule(dynamic)
+#pragma omp parallel for firstprivate(change_bit)
 	for (long long int i = 0; i < shift_n; i++) {
 		change_bit = (i & shift_nk) >> (n - k);
 		B[i] = A[i & inv_nk] * H[change_bit * 2] + A[i | shift_nk] * H[change_bit * 2 + 1];
@@ -43,12 +43,12 @@ int main(int argc, char **argv) {
 	// A initialization
 	long long int shift_n = 1 << n; // 2^n
 	complexd *A = new complexd[shift_n];
-	srand(omp_get_wtime());
 	int real_part = 0, imag_part = 0;
 	float half_max = RAND_MAX / 2;
 	float sum = 0;
-#pragma omp parallel for firstprivate(real_part, imag_part) reduction(+: sum) schedule(dynamic)
+#pragma omp parallel for firstprivate(real_part, imag_part) reduction(+: sum)
 	for (long long int i = 0; i < shift_n; i++) {
+		srand(omp_get_wtime() + i);
 		real_part = rand();
 		if (real_part < half_max) {
 			real_part *= -1;
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 		sum += abs(A[i] * A[i]);
 	}
 	sum = sqrt(sum);
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for
 	for (long long int i = 0; i < shift_n; i++) {
 		A[i] /= sum;
 	}
