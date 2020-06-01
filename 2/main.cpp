@@ -47,7 +47,6 @@ vector_generation(int rank, int size, int n, char *file_name) {
 	for (unsigned long long i = 0; i < shift_n; i++) {
 		A[i] /= all_sum;
 	}
-	return A;
 
 	// Output part
 	MPI_File outf;
@@ -65,7 +64,7 @@ vector_generation(int rank, int size, int n, char *file_name) {
 		MPI_File_write(outf, &imag_part, 1, MPI_DOUBLE, MPI_STATUS_IGNORE);
 	}
 	MPI_File_close(&outf);
-	delete [] A;
+	return A;
 }
 
 void one_qubit_conversion(int rank, int size, complexd *A, complexd *B, double H[4], int n, int k) {
